@@ -34,6 +34,8 @@ func dirExists(name string) bool {
 	return false
 }
 
+var Version string
+
 func main() {
 	var token string
 	var server string
@@ -50,7 +52,9 @@ func main() {
 	var leaveSegments bool
 	var meta arrayFlags
 	var ksAuth = keystone.KeystoneAuth{}
+	var helpVersion = false
 
+	flag.BoolVar(&helpVersion, "version", false, "Show version")
 	flag.BoolVar(&leaveSegments, "leaveSegments", false, "On file overwrite, do not delete old segment files")
 	flag.BoolVar(&upload, "upload", false, "Upload file")
 	flag.BoolVar(&download, "download", false, "Download file")
@@ -80,6 +84,11 @@ func main() {
 	flag.StringVar(&ksAuth.OsPassword, "os-password", "", "User password")
 
 	flag.Parse()
+
+	if helpVersion {
+		fmt.Printf("Version: %s\n", Version)
+		return
+	}
 
 	// keystone env variables
 	// OS_AUTH_URL, OS_USER_DOMAIN_NAME, OS_PROJECT_NAME, OS_USERNAME, OS_PASSWORD
