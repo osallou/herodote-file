@@ -11,7 +11,7 @@ matrix:
 script:
   - go vet
   - go test -v ./...
-  - if [ "${LATEST}" = "true" ]; then GOOS=linux GOARCH=amd64 go build -o hero-file.linux.amd64 hero-file.go
-  - if [ "${LATEST}" = "true" ]; then GOOS=darwin GOARCH=amd64 go build -o hero-file.darwin.amd64 hero-file.go
-  - if [ "${LATEST}" = "true" ]; then GOOS=windows GOARCH=amd64 go build -o hero-file.windows.amd64.exe hero-file.go
+  - if [ "${LATEST}" = "true" ]; then GOOS=linux GOARCH=amd64 go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o hero-file.linux.amd64 hero-file.go; fi
+  - if [ "${LATEST}" = "true" ]; then GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o hero-file.darwin.amd64 hero-file.go; fi
+  - if [ "${LATEST}" = "true" ]; then GOOS=windows GOARCH=amd64 go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o hero-file.windows.amd64.exe hero-file.go; fi
 
