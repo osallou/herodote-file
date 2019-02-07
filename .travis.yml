@@ -1,0 +1,21 @@
+language: go
+sudo: false
+matrix:
+  include:
+    # "1.x" always refers to the latest Go version, inc. the patch release.
+    - go: 1.x
+      env: LATEST=true
+    - go: 1.10.x
+    - go: 1.11.x
+
+install:
+  - # skip
+
+script:
+  - go get -t -v ./...
+  - go vet
+  - go test -v ./...
+  - if [ "${LATEST}" = "true" ]; then GOOS=linux GOARCH=amd64 go build -o hero-file.linux.amd64 hero-file.go
+  - if [ "${LATEST}" = "true" ]; then GOOS=darwin GOARCH=amd64 go build -o hero-file.darwin.amd64 hero-file.go
+  - if [ "${LATEST}" = "true" ]; then GOOS=windows GOARCH=amd64 go build -o hero-file.windows.amd64.exe hero-file.go
+
