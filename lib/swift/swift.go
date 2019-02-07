@@ -193,44 +193,6 @@ func Show(token string, server string, options Options) {
 			}
 		}
 	}
-
-	/*
-			Account meta:
-
-		X-Account-Container-Count => 2
-		X-Account-Storage-Policy-Policy-0-Object-Count => 7
-		Content-Type => application/json; charset=utf-8
-		X-Account-Object-Count => 7
-		X-Account-Storage-Policy-Policy-0-Bytes-Used => 750
-		X-Timestamp => 1515515566.01706
-		Server => Apache
-		X-Openstack-Request-Id => txe72f1f0f6cfc4ae388296-005c5b1650
-		X-Account-Project-Domain-Id => 0de861d3d0fc43eabf692d6dbb1cc257
-		X-Trans-Id => txe72f1f0f6cfc4ae388296-005c5b1650
-		Date => Wed, 06 Feb 2019 17:16:01 GMT
-		X-Account-Storage-Policy-Policy-0-Container-Count => 2
-		X-Account-Bytes-Used => 750
-		X-Account-Meta-Quota-Bytes => 107374182400
-
-			Container meta:
-
-		X-Container-Object-Count => 7
-		X-Container-Meta-Access-Control-Allow-Origin => *
-		X-Container-Bytes-Used => 750
-		X-Trans-Id => tx1d45754156254aab98c87-005c5b16a4
-		Server => Apache
-		Accept-Ranges => bytes
-		Last-Modified => Mon, 04 Feb 2019 16:03:15 GMT
-		Last-Modified => Mon, 04 Feb 2019 16:03:15 GMT
-		Content-Type => application/json; charset=utf-8
-		X-Openstack-Request-Id => tx1d45754156254aab98c87-005c5b16a4
-		X-Storage-Policy => Policy-0
-		X-Container-Meta-Access-Control-Expose-Headers => Content-Length,X-Object-Manifest,X-Container-Bytes-Used,X-Container-Object-Count
-		X-Timestamp => 1547482736.53607
-
-
-	*/
-
 }
 
 // Upload uploads a file to swift

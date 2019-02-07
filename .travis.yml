@@ -2,16 +2,28 @@ language: go
 sudo: false
 matrix:
   include:
-    # "1.x" always refers to the latest Go version, inc. the patch release.
-    - go: 1.x
-      env: LATEST=true
-    - go: 1.10.x
-    - go: 1.11.x
-
+  - go: 1.x
+    env: LATEST=true
+  - go: 1.10.x
+  - go: 1.11.x
 script:
-  - go vet
-  - go test -v ./...
-  - if [ "${LATEST}" = "true" ]; then GOOS=linux GOARCH=amd64 go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o hero-file.linux.amd64 hero-file.go; fi
-  - if [ "${LATEST}" = "true" ]; then GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o hero-file.darwin.amd64 hero-file.go; fi
-  - if [ "${LATEST}" = "true" ]; then GOOS=windows GOARCH=amd64 go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o hero-file.windows.amd64.exe hero-file.go; fi
-
+- go vet
+- go test -v ./...
+- if [ "${LATEST}" = "true" ]; then GOOS=linux GOARCH=amd64 go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o hero-file.linux.amd64 hero-file.go;
+  fi
+- if [ "${LATEST}" = "true" ]; then GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o hero-file.darwin.amd64 hero-file.go;
+  fi
+- if [ "${LATEST}" = "true" ]; then GOOS=windows GOARCH=amd64 go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o hero-file.windows.amd64.exe hero-file.go;
+  fi
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: tmVfhWQWjDd1o3x2qywAcJCk4ddXMMLFnsTnYfOTolGYj+TB8V2EHBDcKXXJi7/xUJIWDJ+zWJmTJnZQfPxDgrqeTFoBkn3m5e5fPGDwNY9N4NOJVyXXrYImlG4j7hnB6M0m5u7A5Sg1NUyRCXClzJkGs1ZhSgnqHGA/2sczM8JsTK/Hsu/jll1tfOGlYJNnO5p4gKXEydvZJHe5UiC+RbU1tjWxZa0xASgnRHHfSHlH7+BT/Yxr7Cmom2yss96KYb/DV9wmKgJoxXs111qw0Jb1aPowB7vvrDfhfJ49Pmwpi98kCPoumYSN2VnXfLmttZFovHSHlxRPg2GfwLzemMngU1lGKMAfyxEE+dVCefYMR7RuVJDs0DebKFMRJtXZHLsKqxblrloesR2Kvp2wCdaD6RZ6yT9hvN4hUxL0gDAzkEPVOza+hRK/hkcCAUIFA+ta/AowHOJFtAK7uY55OEhhEfIHILfyNjxzwRzXfwu77nAliChMaY4CUHVJlMQORRp7ba9hiKfvyYj64kBkA+f8cPGHnHfwftWKp+6Zjtdxf7z7DuVZoHV5cZVpSeRP//DAPLJNay8MfVrWBvHX5wGjWgWNeNVmLH+V2anPaG/NxctgtQ0/wfGiOiklHL7tqfBewX71WCCRfkwsxyQ70XaCyGEXOMaHVdCI6yrWf8g=
+  file:
+    - hero-file.linux.amd64
+    - hero-file.darwin.amd64
+    - hero-file.windows.amd64.exe
+  on:
+    repo: osallou/herodote-file
+    tags: true
