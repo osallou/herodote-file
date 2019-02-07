@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/osallou/hero-file/lib/keystone"
-	logs "github.com/osallou/hero-file/lib/log"
-	swift "github.com/osallou/hero-file/lib/swift"
+	"github.com/osallou/herodote-file/lib/keystone"
+	logs "github.com/osallou/herodote-file/lib/log"
+	swift "github.com/osallou/herodote-file/lib/swift"
 )
 
 var logger = logs.GetLogger("hero.cli")

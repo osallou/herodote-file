@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	logs "github.com/osallou/hero-file/lib/log"
+	logs "github.com/osallou/herodote-file/lib/log"
 )
 
 var logger = logs.GetLogger("hero.keystone")
