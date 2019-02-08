@@ -3,6 +3,7 @@ package swift
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -149,8 +150,9 @@ func Head(token string, server string, options Options) string {
 }
 
 // Show prints object meta data
-func Show(token string, server string, options Options) {
+func Show(token string, server string, options Options) (data map[string]string, err error) {
 	client := &http.Client{}
+	data = make(map[string]string)
 	url := []string{server, options.Bucket, options.File}
 	logger.Debugf("Call %s\n", strings.Join(url, "/"))
 	req, _ := http.NewRequest("HEAD", strings.Join(url, "/"), nil)
@@ -159,40 +161,18 @@ func Show(token string, server string, options Options) {
 	resp, err := client.Do(req)
 	if err != nil {
 		logger.Errorf("Failed to contact server %s\n", server)
-		return
+		return data, errors.New(resp.Status)
+	}
+	if resp.StatusCode != 200 && resp.StatusCode != 204 {
+		logger.Errorf("Error %s\n", resp.Status)
+		return data, errors.New(resp.Status)
 	}
 	defer resp.Body.Close()
 
 	for k, v := range resp.Header {
-		if k == "Content-Length" || k == "Last-Modified" {
-			fmt.Printf("%s => %s\n", k, v[0])
-		}
-		if strings.HasPrefix(k, "X-Object-Meta-") {
-			fmt.Printf("Metadata: %s => %s\n", strings.Replace(k, "X-Object-Meta-", "", -1), v[0])
-		}
-
-		if options.Bucket == "" {
-			switch k {
-			case "X-Account-Container-Count":
-				fmt.Printf("Account container count: %s\n", v[0])
-			case "X-Account-Object-Count":
-				fmt.Printf("Account object count: %s\n", v[0])
-			case "X-Account-Bytes-Used":
-				fmt.Printf("Account bytes count: %s\n", v[0])
-			case "X-Account-Meta-Quota-Bytes":
-				fmt.Printf("Account quota bytes: %s\n", v[0])
-			}
-		} else if options.File == "" {
-			switch k {
-			case "X-Container-Object-Count":
-				fmt.Printf("Container object count: %s\n", v[0])
-			case "X-Container-Bytes-Used":
-				fmt.Printf("Container bytes count: %s\n", v[0])
-			case "X-Container-Meta-Quota-Bytes":
-				fmt.Printf("Container quota bytes: %s\n", v[0])
-			}
-		}
+		data[k] = v[0]
 	}
+	return data, nil
 }
 
 // Upload uploads a file to swift
@@ -341,6 +321,7 @@ func DeleteFile(token string, server string, options Options) bool {
 		logger.Errorf("Error: %s\n", resp.Status)
 		return false
 	}
+	logger.Infof("Deleted %s:%s\n", options.Bucket, options.File)
 	return true
 }
 

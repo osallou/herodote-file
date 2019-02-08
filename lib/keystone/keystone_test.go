@@ -36,7 +36,7 @@ func TestKeystoneAuth(t *testing.T) {
 		// fmt.Printf("%v", req.Header)
 		fmt.Printf("Requested url %s\n", req.RequestURI)
 		if req.RequestURI == "/v3/auth/tokens" {
-			fmt.Printf("Return auth: %s\n", ksAuth)
+			// fmt.Printf("Return auth: %s\n", ksAuth)
 			res.Header().Set("X-Subject-Token", "XYZ")
 			res.WriteHeader(201)
 			res.Write([]byte(ksAuth))

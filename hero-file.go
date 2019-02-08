@@ -56,17 +56,10 @@ func main() {
 
 	flag.BoolVar(&helpVersion, "version", false, "Show version")
 	flag.BoolVar(&leaveSegments, "leaveSegments", false, "On file overwrite, do not delete old segment files")
-	flag.BoolVar(&upload, "upload", false, "Upload file")
-	flag.BoolVar(&download, "download", false, "Download file")
-	flag.BoolVar(&stat, "stat", false, "Show stats on a file/bucket/account")
-	flag.BoolVar(&delete, "delete", false, "Delete file")
-	flag.StringVar(&bucket, "bucket", "", "bucket to use")
-	flag.StringVar(&file, "file", "", "File to upload/download")
 	flag.StringVar(&objName, "object-name", "", "Upload/download as")
-	flag.StringVar(&prefix, "prefix", "", "File prefix for search")
-	flag.BoolVar(&list, "list", false, "List files")
+	flag.StringVar(&prefix, "prefix", "", "File prefix for search/delete/download")
 	flag.Int64Var(&segmentSize, "segment-size", 1000000000, "Size of segments")
-	flag.Var(&meta, "meta", "upload meta data key:value.")
+	flag.Var(&meta, "meta", "upload meta data with format key:value.")
 	/*
 			  --os-auth-url https://api.example.com/v3 \
 		      --os-project-name project1 --os-project-domain-name domain1 \
@@ -75,15 +68,87 @@ func main() {
 
 	*/
 	flag.StringVar(&token, "os-auth-token", "", "Authentication token")
-	flag.StringVar(&server, "os-storage-url", "", "Storage url https://genostack-api-swift.genouest.org/v1/AUTH_XXX")
+	flag.StringVar(&server, "os-storage-url", "", "Storage url https://api.example.com/v1/AUTH_XXX")
 	flag.StringVar(&ksAuth.OsAuthURL, "os-auth-url", "", "Keystone auth url https://api.example.com/v3")
 	flag.StringVar(&ksAuth.OsUserDomainName, "os-user-domain-name", "", "User domain name")
 	flag.StringVar(&ksAuth.OsProjectDomainName, "os-project-domain-name", "", "Project domain name")
 	flag.StringVar(&ksAuth.OsProjectName, "os-project-name", "", "Project name")
 	flag.StringVar(&ksAuth.OsUserName, "os-username", "", "User name")
 	flag.StringVar(&ksAuth.OsPassword, "os-password", "", "User password")
+	var CommandLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	cmdHelp := `
+Positional arguments:
+	<subcommand>
+		list		List content of a bucket
+		stat		Show account/bucket/file metadata
+		upload		Upload a file or directory to a bucket
+		download	Download a file or list of files (prefix)
+		delete		Delete a file or a list of files (prefix)
+
+Examples:
+
+  List content of *mybucket* bucket:
+  hero-file --os-auth-url https://api.example.com/v3 --os-auth-token XXX list mybucket
+
+  Download bucket file *data/myfile.txt* and save it locally with different name *myfile.out*
+  hero-file --object-name myfile.out download mybucket data/myfile.txt
+
+  Download all bucket files starting with *data*:
+  hero-file --prefix data download mybucket
+
+  Upload a local file *localfile.txt* to a bucket with remote name *data/localfile.txt*
+  hero-file --object-name data/localfile.txt upload mybucket localfile.txt
+
+  Delete a remote file:
+  hero-file delete mybucket data/myfile.txt
+
+  Delete all files with prefix *data*:
+  hero-file --prefix data delete mybucket
+
+  Get bucket information:
+  hero-file stat mybucket
+
+  Get file information:
+  hero-file stat mybucket data/myfile.txt
+	`
+	flag.Usage = func() {
+		fmt.Fprintf(CommandLine.Output(), "Usage of %s:\n", os.Args[0])
+		fmt.Fprintf(CommandLine.Output(), "%s [options] <subcommand> <bucket> <file>\n", os.Args[0])
+		fmt.Fprintf(CommandLine.Output(), "%s\n", cmdHelp)
+		// TODO other commands
+		fmt.Fprintf(CommandLine.Output(), "Optional arguments\n")
+		flag.PrintDefaults()
+	}
 
 	flag.Parse()
+
+	tail := flag.Args()
+	lenTail := len(tail)
+	if lenTail == 0 {
+		fmt.Printf("No command specified\n")
+		flag.PrintDefaults()
+		return
+	}
+	switch tail[0] {
+	case "stat":
+		stat = true
+	case "upload":
+		upload = true
+	case "download":
+		download = true
+	case "delete":
+		delete = true
+	case "list":
+		list = true
+	}
+
+	if lenTail > 1 {
+		bucket = tail[1]
+	}
+
+	if lenTail > 2 {
+		file = tail[2]
+	}
 
 	if helpVersion {
 		fmt.Printf("Version: %s\n", Version)
@@ -215,7 +280,35 @@ func main() {
 			swift.DeleteWithSegments(token, server, options)
 		}
 	} else if stat {
-		swift.Show(token, server, options)
+		statInfo, err := swift.Show(token, server, options)
+		if err != nil {
+			fmt.Printf("An error occured: %s\n", err)
+			return
+		}
+		for k, v := range statInfo {
+			if k == "Content-Length" || k == "Last-Modified" {
+				fmt.Printf("%s => %s\n", k, v)
+			}
+			if strings.HasPrefix(k, "X-Object-Meta-") {
+				fmt.Printf("Metadata: %s => %s\n", strings.Replace(k, "X-Object-Meta-", "", -1), v)
+			}
+			switch k {
+			case "X-Account-Container-Count":
+				fmt.Printf("Account container count: %s\n", v)
+			case "X-Account-Object-Count":
+				fmt.Printf("Account object count: %s\n", v)
+			case "X-Account-Bytes-Used":
+				fmt.Printf("Account bytes count: %s\n", v)
+			case "X-Account-Meta-Quota-Bytes":
+				fmt.Printf("Account quota bytes: %s\n", v)
+			case "X-Container-Object-Count":
+				fmt.Printf("Container object count: %s\n", v)
+			case "X-Container-Bytes-Used":
+				fmt.Printf("Container bytes count: %s\n", v)
+			case "X-Container-Meta-Quota-Bytes":
+				fmt.Printf("Container quota bytes: %s\n", v)
+			}
+		}
 	} else if list {
 		options.File = ""
 		options.ObjectName = ""

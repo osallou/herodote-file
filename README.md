@@ -27,11 +27,11 @@ A token can be given via --os-auth-token option or Openstack credentials file ca
     # export HERO_DEBUG=1 // for debug
     export HEROTOKEN=XXX
     
-    go run hero-file.go --os-auth-token $HEROTOKEN --os-storage-url https://genostack-api-swift.genouest.org/v1/AUTH_XXX --list --bucket mybucketname
+    go run hero-file.go --os-auth-token $HEROTOKEN --os-storage-url https://genostack-api-swift.genouest.org/v1/AUTH_XXX list mybucketname
 
 
 With openstack credentials file:
 
     . ~/my_openstackrc.sh
-    go run hero-gile.go --list --bucket mybucketname
+    go run hero-gile.go list mybucketname
 
