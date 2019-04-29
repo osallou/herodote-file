@@ -1,11 +1,5 @@
 # Hero-file
 
-## Status
-
-in development but operational for testing
-
-Caution: some flags, methods etc. may change until stable release
-
 ## About
 
 *hero-file* is an Openstack Swift client equivalent (though not all features are implemented).
