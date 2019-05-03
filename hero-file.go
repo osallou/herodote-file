@@ -129,6 +129,7 @@ Examples:
 		flag.PrintDefaults()
 		return
 	}
+
 	switch tail[0] {
 	case "stat":
 		stat = true
@@ -148,6 +149,10 @@ Examples:
 
 	if lenTail > 2 {
 		file = tail[2]
+	}
+
+	if lenTail > 4 && tail[3] == "--object-name" {
+		objName = tail[4]
 	}
 
 	if helpVersion {
