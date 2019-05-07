@@ -283,6 +283,10 @@ func Upload(token string, server string, options Options) bool {
 
 // DeleteWithPrefix deletes all files matching prefix
 func DeleteWithPrefix(token string, server string, options Options) {
+	if options.Prefix == "**/*" {
+		fmt.Println("Warning: deleting all files")
+		options.Prefix = ""
+	}
 	files := List(token, server, options)
 	for _, file := range files {
 		options.File = file.Name

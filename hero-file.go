@@ -105,6 +105,9 @@ Examples:
   Delete all files with prefix *data*:
   hero-file --prefix data delete mybucket
 
+  Delete all files:
+  hero-file --prefix "**/*" delete mybucket
+
   Get bucket information:
   hero-file stat mybucket
 
