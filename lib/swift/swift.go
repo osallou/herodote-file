@@ -78,7 +78,19 @@ func uploadManifest(token string, server string, segmentPrefix string, options O
 		return false
 	} else {
 		logger.Debugf("Manifest uploaded => %s", strings.Join(url, "/"))
+		jobids := resp.Header.Get("X-HERO-JOBS")
+		if jobids != "" {
+			printJobIds(jobids)
+		}
 		return true
+	}
+}
+
+func printJobIds(ids string) {
+	fmt.Printf("Submitted jobs:\n")
+	jobs := strings.Split(ids, ",")
+	for _, j := range jobs {
+		fmt.Printf("\t%s\n", j)
 	}
 }
 
@@ -118,6 +130,10 @@ func uploadSegment(ch chan bool, token string, server string, options Options, s
 		logger.Errorf("Failed to upload file: %s", resp.Status)
 		ch <- false
 	} else {
+		jobids := resp.Header.Get("X-HERO-JOBS")
+		if jobids != "" {
+			printJobIds(jobids)
+		}
 		ch <- true
 	}
 }
