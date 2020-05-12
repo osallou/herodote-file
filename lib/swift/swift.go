@@ -235,10 +235,7 @@ func Upload(token string, server string, options Options) bool {
 			newObjectName := strings.Join(segmentFileName, "/")
 			options.ObjectName = newObjectName
 			go uploadSegment(ch, token, server, options, segment)
-			start += segmentSize
-			size += options.Size
-		}
-		for uploadDone < nbSegment {
+
 			uploadRes := <-ch
 			if !uploadRes {
 				fmt.Printf("Failed to upload file segment\n")
@@ -246,7 +243,21 @@ func Upload(token string, server string, options Options) bool {
 				fmt.Println("Segment uploaded!")
 			}
 			uploadDone++
+
+			start += segmentSize
+			size += options.Size
 		}
+		/*
+			for uploadDone < nbSegment {
+				uploadRes := <-ch
+				if !uploadRes {
+					fmt.Printf("Failed to upload file segment\n")
+				} else {
+					fmt.Println("Segment uploaded!")
+				}
+				uploadDone++
+			}
+		*/
 		close(ch)
 		options.Bucket = project
 		options.ObjectName = origFile
