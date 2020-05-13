@@ -315,6 +315,8 @@ Examples:
 				fmt.Printf("Container bytes count: %s\n", v)
 			case "X-Container-Meta-Quota-Bytes":
 				fmt.Printf("Container quota bytes: %s\n", v)
+			case "Etag":
+				fmt.Printf("MD5 => %s\n", v)
 			}
 		}
 	} else if list {
